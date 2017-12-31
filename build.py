@@ -4,6 +4,7 @@ import os
 import argparse
 import logging
 import cv2
+import random
 
 
 import torch
@@ -44,12 +45,16 @@ class NanonetDataset(Dataset):
 
 class PersonTransform(object):
 
-    def __init__(self, resize):
+    def __init__(self, resize, random_flip=0.3):
         self.resize = resize
+        self.random_flip = random_flip
 
     def __call__(self, image, *args, **kwargs):
         image = cv2.resize(image, (self.resize, self.resize))
         image = image.transpose((2, 0, 1))
+        k = random.random()
+        if k > self.random_flip:
+            cv2.flip(image, 0)
         image = torch.from_numpy(image)
 
         return image
